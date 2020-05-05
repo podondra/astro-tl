@@ -14,4 +14,4 @@ The envrinment is based on Python 3.7.2, CUDA 10.1 and Parallel HDF5.
     $ pip install mpi4py
     $ CC="mpicc" HDF5_MPI="ON" HDF5_DIR=/path/to/parallel-hdf5 pip install --no-binary=h5py h5py
     $ pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-    $ pip install requirements.txt
+    $ pip install -r requirements.txt
