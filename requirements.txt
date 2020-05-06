@@ -71,7 +71,7 @@ seaborn==0.10.1
 semantic-version==2.8.5
 Send2Trash==1.5.0
 six==1.14.0
-specutils==1.0
+spectres==2.1.1
 tensorboard==2.2.1
 tensorboard-plugin-wit==1.6.0.post3
 terminado==0.8.3

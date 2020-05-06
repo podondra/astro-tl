@@ -1,0 +1,9 @@
+*.hdf5
+.ipynb_checkpoints/
+data/*
+!data/README.md
+logs/
+misc/
+slurm/
+runs/
+venv/
