@@ -1,5 +1,6 @@
 *.hdf5
 .ipynb_checkpoints/
+__pycache__/
 data/*
 !data/README.md
 logs/
