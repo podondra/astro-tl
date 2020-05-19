@@ -11,6 +11,102 @@ from torch.utils.tensorboard import SummaryWriter
 N_WAVES = 2048
 
 
+def vgg_net_0():
+    return nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(2048, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
+def vgg_net_1():
+    return nn.Sequential(
+        nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2, stride=2),
+        nn.Flatten(),
+        nn.Linear(1024 * 16, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
+def vgg_net_2():
+    return nn.Sequential(
+        nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2, stride=2),
+        nn.Conv1d(16, 32, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Flatten(),
+        nn.Linear(512 * 32, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
+def vgg_net_3():
+    return nn.Sequential(
+        nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2, stride=2),
+        nn.Conv1d(16, 32, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(32, 64, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Flatten(),
+        nn.Linear(256 * 64, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
+def vgg_net_4():
+    return nn.Sequential(
+        nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2, stride=2),
+        nn.Conv1d(16, 32, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(32, 64, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(64, 128, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Flatten(),
+        nn.Linear(128 * 128, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
+def vgg_net_5():
+    return nn.Sequential(
+        nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(kernel_size=2, stride=2),
+        nn.Conv1d(16, 32, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(32, 64, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(64, 128, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Conv1d(128, 128, 3, padding=1), nn.ReLU(),
+        nn.MaxPool1d(2, 2),
+        nn.Flatten(),
+        nn.Linear(64 * 128, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1024), nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(1024, 1)
+    )
+
+
 def vgg_net_a():
     return nn.Sequential(
         nn.Conv1d(1, 16, 3, padding=1), nn.ReLU(),
@@ -140,6 +236,18 @@ def get_convnet(convnet):
         return vgg_net_d()
     if convnet == "VGG Net-E":
         return vgg_net_e()
+    if convnet == "VGG Net-0":
+        return vgg_net_0()
+    if convnet == "VGG Net-1":
+        return vgg_net_1()
+    if convnet == "VGG Net-2":
+        return vgg_net_2()
+    if convnet == "VGG Net-3":
+        return vgg_net_3()
+    if convnet == "VGG Net-4":
+        return vgg_net_4()
+    if convnet == "VGG Net-5":
+        return vgg_net_5()
 
 
 def load_data():
@@ -222,12 +330,22 @@ def train(convnet, data_dict, patiance, n_validation, n_training, writer):
 
 
 @click.command()
-@click.option("--convnet", type=click.Choice(["VGG Net-A", "VGG Net-B", "VGG Net-D", "VGG Net-E"]))
-@click.option("-p", "--patiance", default=512, show_default=True,
+@click.option("--convnet",
+              type=click.Choice(["VGG Net-A",
+                                 "VGG Net-B",
+                                 "VGG Net-D",
+                                 "VGG Net-E",
+                                 "VGG Net-0",
+                                 "VGG Net-1",
+                                 "VGG Net-2",
+                                 "VGG Net-3",
+                                 "VGG Net-4",
+                                 "VGG Net-5"]))
+@click.option("-p", "--patiance", default=1024, show_default=True,
               help="The number of times to observe worsenning validation set error before giving up.")
 @click.option("--n-validation", default=1, show_default=True,
               help="The number of steps between validation loss evaluations.")
-@click.option("--n-training", default=1024, show_default=True,
+@click.option("--n-training", default=256, show_default=True,
               help="The number of steps between training loss evaluations.")
 @click.argument("save_path", type=click.Path(dir_okay=False, writable=True))
 def cli(convnet, patiance, n_validation, n_training, save_path):
