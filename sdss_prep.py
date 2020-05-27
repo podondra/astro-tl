@@ -54,8 +54,7 @@ with h5py.File("sdss_dr14.hdf5", "r+") as datafile:
     # original and new wavelengths (EPS not to get NaNs)
     lam = np.logspace(LOGLAMMIN, LOGLAMMAX, 3659)
     new_lam = np.logspace(LOGLAMMIN + EPS, LOGLAMMAX - EPS, N_WAVES)
-    # TODO probably here the dtype is changed to float64 but it should be float32
-    X = spectres(new_lam, lam, X, verbose=True)
+    X = spectres(new_lam, lam, X, verbose=True).astype(np.float32, copy=False)
 
     # minmax scale each spectrum
     X = minmax_scale(X, feature_range=(-1, 1), axis=1, copy=False)

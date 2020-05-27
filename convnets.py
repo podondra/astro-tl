@@ -253,13 +253,9 @@ def get_convnet(convnet):
 def load_data():
     with h5py.File("sdss_dr14.hdf5", "r") as datafile:
         grp = datafile['2048_zwarning==0']
-        X_dset = grp["X_tr"]
-        with X_dset.astype("float32"):
-            X = X_dset[:]
+        X = grp["X_tr"][:]
         y = grp["y_tr"][:]
-        X_va_dset = grp["X_va"]
-        with X_va_dset.astype("float32"):
-            X_va = X_va_dset[:]
+        X_va = grp["X_va"][:]
         y_va = grp["y_va"][:]
 
     return {"ds": TensorDataset(*list(map(torch.from_numpy, [X.reshape(-1, 1, N_WAVES), y.astype("f4")]))),
@@ -329,18 +325,20 @@ def train(convnet, data_dict, patiance, n_validation, n_training, writer):
     return best_state_dict
 
 
+CONVNETS = ["VGG Net-A",
+            "VGG Net-B",
+            "VGG Net-D",
+            "VGG Net-E",
+            "VGG Net-0",
+            "VGG Net-1",
+            "VGG Net-2",
+            "VGG Net-3",
+            "VGG Net-4",
+            "VGG Net-5"]
+
 @click.command()
 @click.option("--convnet",
-              type=click.Choice(["VGG Net-A",
-                                 "VGG Net-B",
-                                 "VGG Net-D",
-                                 "VGG Net-E",
-                                 "VGG Net-0",
-                                 "VGG Net-1",
-                                 "VGG Net-2",
-                                 "VGG Net-3",
-                                 "VGG Net-4",
-                                 "VGG Net-5"]))
+              type=click.Choice(CONVNETS))
 @click.option("-p", "--patiance", default=1024, show_default=True,
               help="The number of times to observe worsenning validation set error before giving up.")
 @click.option("--n-validation", default=1, show_default=True,

@@ -5,8 +5,6 @@ from sklearn.preprocessing import minmax_scale
 from spectres import spectres
 
 
-# size according to ILSVRC
-N_TEST = 100000
 # ID_DTYPE
 ID_DTYPE = [("lmjd", np.int32), ("planid", "S40"), ("spid", np.uint8), ("fiberid", np.uint8)]
 
@@ -49,20 +47,22 @@ with h5py.File("lamost_dr5.hdf5", "r+") as datafile:
     # original and new wavelengths (EPS not to get NaNs)
     lam = np.logspace(LOGLAMMIN, LOGLAMMAX, 3659)
     new_lam = np.logspace(LOGLAMMIN + EPS, LOGLAMMAX - EPS, N_WAVES)
-    X = spectres(new_lam, lam, X, verbose=True)
+    X = spectres(new_lam, lam, X, verbose=True).astype(np.float32, copy=False)
 
     # minmax scale each spectrum
     X = minmax_scale(X, feature_range=(-1, 1), axis=1, copy=False)
     
     # split into training, validation and test set (sizes according to ILSVRC)
-    n_tr = n - N_TEST
+    # size according to ILSVRC
+    N_VAL, N_TEST = 50000, 100000
+    n_tr = n - N_VAL - N_TEST
     # seed from random.org
     rng = np.random.default_rng(seed=26)
     rnd_idx = rng.permutation(n)
-    idx_tr, idx_te = rnd_idx[:n_tr], rnd_idx[n_tr:]
+    idx_tr, idx_va, idx_te = rnd_idx[:n_tr], rnd_idx[n_tr:n_tr + N_VAL], rnd_idx[n_tr + N_VAL:]
 
     grp = datafile.create_group("{}_nofilter".format(N_WAVES))
-    for idx, name in ((idx_tr, "tr"), (idx_te, "te")):
+    for idx, name in ((idx_tr, "tr"), (idx_va, "va"), (idx_te, "te")):
         grp.create_dataset("X_" + name, data=X[idx])
         grp.create_dataset("y_" + name, data=y[idx])
         grp.create_dataset("id_" + name, data=ids[idx])
