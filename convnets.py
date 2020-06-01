@@ -274,7 +274,7 @@ def train(convnet, datasets, writer, n_validation):
     criterion = nn.BCEWithLogitsLoss()
 
     i = 0
-    best_f1_score = float("inf")
+    best_f1_score = 0
     improvement = True
     while improvement:
         improvement = False
@@ -297,10 +297,11 @@ def train(convnet, datasets, writer, n_validation):
                     writer.add_scalar("Loss/validation", loss_va.item(), i + 1)
                     writer.add_scalar("F1 score/validation", f1_score, i + 1)
 
-                    if f1_score < best_f1_score:
+                    if f1_score > best_f1_score:
                         best_f1_score = f1_score
                         best_state_dict = copy.deepcopy(convnet.state_dict())
                         improvement = True
+                        print(i, best_f1_score)
 
             # next iteration
             i += 1
@@ -314,12 +315,12 @@ CONVNETS = ["VGG-Net-A", "VGG-Net-B", "VGG-Net-D", "VGG-Net-E", "VGG-Net-0",
 @click.command()
 @click.option("--convnet", type=click.Choice(CONVNETS))
 @click.option("--n-validation", default=1, show_default=True, help="The number of steps between validation loss evaluations.")
-def cli(convnet, n_validation, save_path):
+def cli(convnet, n_validation):
     writer = SummaryWriter(comment="_{}".format(convnet))
     datasets = load_datasets()
-    convnet = get_convnet(convnet)
-    convnet.apply(init_weights)
-    best_state_dict = train(convnet, datasets, writer, n_validation)
+    model = get_convnet(convnet)
+    model.apply(init_weights)
+    best_state_dict = train(model, datasets, writer, n_validation)
     torch.save(best_state_dict, convnet + ".pt")
 
 

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     datasets = TensorDataset(*list(map(torch.from_numpy, [X, y]))), TensorDataset(*list(map(torch.from_numpy, [X_va, y_va])))
 
     model = convnets.vgg_net_a()
-    model.apply(convnets.init_weights)
-    writer = SummaryWriter(comment="_LAMOST")
+    model.load_state_dict(torch.load("VGG-Net-A.pt"))
+    writer = SummaryWriter(comment="_transfer")
     best_state_dict = convnets.train(model, datasets, writer, n_validation=1)
-    torch.save(best_state_dict, "lamost.pt")
+    torch.save(best_state_dict, "transfer.pt")
