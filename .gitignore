@@ -5,6 +5,8 @@ data/*
 !data/README.md
 logs/
 misc/
+models/
 slurm/
 runs/
 venv/
+worksheet.ipynb
