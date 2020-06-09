@@ -6,6 +6,7 @@ data/*
 logs/
 misc/
 models/
+pred/
 slurm/
 runs/
 venv/
